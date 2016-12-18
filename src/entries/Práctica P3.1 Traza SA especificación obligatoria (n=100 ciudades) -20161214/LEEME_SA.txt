@@ -1,0 +1,65 @@
+1. Fichero distancias_sa_100_2016.txt
+
+Contiene la información de distancias para el problema de 100 ciudades. Utilizando una inicialización voraz el coste de la solución generada con esta matriz
+es de 4636km.
+
+
+2. Fichero aleatorios_sa_2016_casoN.txt:
+
+Contiene un total de 10000 números aleatorios en el rango [0, 1) que son utilizados para comprobar la condición de aceptación de la solución candidata.
+
+No se requiere transformar estos números aleatorios, sino que se utilizan directamente.
+
+
+3. Fichero traza_sa_2016_casoN.txt 
+
+Contiene la traza de ejecución del caso de uso paso a paso para los números aleatorios del fichero anterior. En el fichero se muestra la siguiente información:
+
+* SOLUCIÓN INICIAL
+	- Recorrido inicial, generado mediante el método de inicialización voraz.
+	- Coste (en km) de la solución, longitud total del recorrido.
+	- Valor de inicialización de la temperatura.
+
+* ITERACIONES
+	- Índices de intercambio. Posiciones en el array de ciudades que se intercambian para generar la nueva solución.
+	  Para generar el vecindario de una solución se exploran todos los posibles intercambios (i, j), que cumplan las siguientes condiciones:
+		-> i != j
+		-> i > j
+	  De entre todos los intercambios generados nos quedamos con el de menor coste, el “mejor vecino”. Los índices de intercambio con los que se ha generado el mejor vecino son los que se muestran en la traza.
+	- Coste (en km) de la solución, longitud total del recorrido.
+	- Delta: Diferencia entre el coste de la solución candidata y la mejor global
+	  delta = coste(mejor_global) - coste(candidata)
+	- Temperatura: Valor de la temperatura en la iteración actual.
+	  No cambia en las iteraciones del bucle interno, L(T), hasta que se produce un enfriamiento.
+	- Valor de la exponencial: valor de e^{-delta/T) en la iteración actual
+	- Solución candidata aceptada: Indica que la solución candidata se ha aceptado en la iteración actual. No se imprime esta línea cuando en caso de que sea rechazada.
+	- Candidatas probadas/aceptadas: Contadores necesarios para el criterio de la velocidad de enfriamiento L(T).
+
+* ENFRIAMIENTOS
+	- Cuando se cumple alguno de los criterios para que se lleve a cabo un enfriamiento, se señala esta operación con la marca “ENFRIAMIENTO: XX”, donde XX es el número de veces que se ha llevado a cabo esta operación durante la ejecución del algoritmo.
+	- Valor de la temperatura después de realizar el enfriamiento aplicando el mecanismo de Cauchy.
+
+* MEJOR SOLUCIÓN
+	- Recorrido de la mejor solución encontrada por el algoritmo.
+	- Coste (en km) de la mejor solución, longitud total del recorrido.
+	- Valores de mu y phi de la esta ejecución.
+
+
+4. A tener en cuenta para la generación de la traza:
+Para facilitar el proceso de evaluación se comparará la traza generada por vuestra implementación con la traza de referencia, por lo que debéis 
+seguir exactamente el mismo formato a la hora de imprimir los resultados.
+
+Los números en punto flotante están impresos con una precisión de 6 decimales.
+
+También es requisito que vuestra práctica pueda ejecutarse por línea de comandos y acepte, los siguientes argumentos en este orden:
+	fichero_distancias [fichero_aleatorios]
+
+El segundo argumento es opcional: 
+	* Si no se le proporciona, vuestra implementación generará una secuencia de números aleatorios diferente en cada ejecución. 
+	* Si se le proporciona, se utilizará la secuencia de valores proporcionados en el fichero.
+
+La salida debe imprimirse por consola, de forma que se pueda ejecutar por línea de comandos de la siguiente forma:
+	* C/C++:	./ejecutable fichero_distancias [fichero_aleatorios] > traza_salida.txt
+	* Java:	java -jar fichero_distancias [fichero_aleatorios] > traza_salida.txt
+	* Python:	./script.py fichero_distancias [fichero_aleatorios] > traza_salida.txt
+

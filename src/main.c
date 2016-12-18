@@ -6,7 +6,8 @@ int main(int argc, char const *argv[]) {
   switch (argc){
     case 2:
     initWithoutRandom(argv[1]);
-    generateGreedyInitialSolution();
+    // generateGreedyInitialSolution();
+    generateInitialSolution();
     run();
     break;
     case 3:

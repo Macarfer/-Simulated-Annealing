@@ -59,6 +59,7 @@ void calculateNeighbors();
 void reinitializeTabuMatrix();
 void printArray(int * array,int size);
 void addTobestSolutions();
+int calculateDistance(int * vector);
 
 void run(){
   printf("SOLUCIÓN INICIAL:\n");
@@ -84,6 +85,28 @@ void initWithRandom(const char *path,const char * pathToRandom){
 }
 
 
+void generateInitialSolution(){
+int index=1,actualValue;
+  actualSolution[0]=0;
+  actualSolution[DIMENSION]=0;
+  printActualSolution();
+  for(;index<DIMENSION;){
+    actualValue =(int) (1 + fmod(floor(rand()*numberOfCities-1),numberOfCities));
+    for(;isvalueinarray(actualValue,actualSolution,numberOfCities);){
+      actualValue++;
+      actualValue=(int) fmod(actualValue,numberOfCities);
+    }
+    actualSolution[index]=actualValue;
+    index++;
+  }
+  printActualSolution();
+  calculateInitialDistance();
+  minimalDistance=actualDistance;
+  tDistance=minimalDistance;
+  TEMPERATURE_ZERO= (MU/(-log(PHI))*actualDistance);
+  TEMPERATURE=TEMPERATURE_ZERO;
+}
+
 void generateGreedyInitialSolution(){
   int index0=0,index,asignations;
   actualSolution[0]=0;
@@ -100,8 +123,8 @@ void generateGreedyInitialSolution(){
       }
     usedNumbers[index0]=1;
     actualSolution[asignations+1]=index0;
-    // (frequency=(freq[actualSolution[asignations]][index0]+=1)) > maxFreq ? maxFreq=frequency : maxFreq;
-    // (frequency=(freq[index0][actualSolution[asignations]]+=1)) < minFreq ? minFreq=frequency : minFreq;
+    (frequency=(freq[actualSolution[asignations]][index0]+=1)) > maxFreq ? maxFreq=frequency : maxFreq;
+    (frequency=(freq[index0][actualSolution[asignations]]+=1)) < minFreq ? minFreq=frequency : minFreq;
     actualDistance = MAX_INT;
   }
   actualSolution[DIMENSION]=0;
@@ -109,7 +132,7 @@ void generateGreedyInitialSolution(){
   calculateInitialDistance();
   minimalDistance=actualDistance;
   tDistance=minimalDistance;
-  TEMPERATURE_ZERO= (MU/(-log(PHI)))*actualDistance;
+  TEMPERATURE_ZERO= (MU/(-log(PHI))*actualDistance);
   TEMPERATURE=TEMPERATURE_ZERO;
 }
 
@@ -122,8 +145,7 @@ void generateGreedyRestartSolution(){
   for(asignations=0;asignations<=numberOfCities;asignations++){
     for(index=1;index<=numberOfCities;index++){
       newDistance = distanceMatrix[actualSolution[asignations]][index];
-      temporalDistance = newDistance ;
-      //+ MU * (maxFreq-minFreq)*(freq[actualSolution[asignations]][index]/maxFreq);
+      temporalDistance = newDistance + PEN * (maxFreq-minFreq)*(freq[actualSolution[asignations]][index]/maxFreq);
       if(temporalDistance < actualDistance && usedNumbers[index]==0){
         index0=index;
         actualDistance=newDistance;
@@ -137,8 +159,14 @@ void generateGreedyRestartSolution(){
   }
 
   actualSolution[DIMENSION]=0;
-
-  printActualSolution();
+  actualDistance  =calculateDistance(actualSolution);
+  tDistance=actualDistance;
+  copyArray(bestNeighbor,actualSolution,DIMENSION);
+  if(actualDistance < minimalDistance){
+    solIterations=iterations;
+    copyArray(solution,actualSolution,DIMENSION);
+    minimalDistance=actualDistance;
+  }
 }
 
 void calculateInitialDistance(){
@@ -195,6 +223,7 @@ void calculateNeighbors(){
   copyArray(bestNeighbor,actualSolution,DIMENSION);
   copyArray(vector,actualSolution,DIMENSION);
   for(;line<MAXITERATIONS;){
+  srand(time(NULL));
      index0=1;
      index1=1;
      line++;
@@ -218,11 +247,20 @@ void calculateNeighbors(){
      bestNeighbor[bestIndex0]=actualSolution[bestIndex1];
      bestNeighbor[bestIndex1]=actualSolution[bestIndex0];
 
+    (frequency=(freq[bestNeighbor[bestIndex0]][bestNeighbor[bestIndex0-1]]+=1))  > maxFreq ? maxFreq=frequency : maxFreq;
+    (frequency=(freq[bestNeighbor[bestIndex0]][bestNeighbor[bestIndex0+1]]+=1))  > maxFreq ? maxFreq=frequency : maxFreq;
+    (frequency=(freq[bestNeighbor[bestIndex1]][bestNeighbor[bestIndex1+1]]+=1))  > maxFreq ? maxFreq=frequency : maxFreq;
+    (frequency=(freq[bestNeighbor[bestIndex1]][bestNeighbor[bestIndex1-1]]+=1))  > maxFreq ? maxFreq=frequency : maxFreq;
+    (frequency=(freq[bestNeighbor[bestIndex0-1]][bestNeighbor[bestIndex0]]+=1)) < minFreq ? minFreq=frequency : minFreq;
+    (frequency=(freq[bestNeighbor[bestIndex0+1]][bestNeighbor[bestIndex0]]+=1)) < minFreq ? minFreq=frequency : minFreq;
+    (frequency=(freq[bestNeighbor[bestIndex1-1]][bestNeighbor[bestIndex1]]+=1)) < minFreq ? minFreq=frequency : minFreq;
+    (frequency=(freq[bestNeighbor[bestIndex1+1]][bestNeighbor[bestIndex1]]+=1)) < minFreq ? minFreq=frequency : minFreq;
+
      DELTA = actualDistance - tDistance;
      EXPONENTIAL=pow(M_E,-DELTA/TEMPERATURE);
      POSIBLE_SOLUTIONS++;
 
-     if((activatedRandoms ? randoms[iterations-1] : rand()) <EXPONENTIAL || DELTA < 0){
+     if( DELTA < 0){
        copyArray(actualSolution,bestNeighbor,DIMENSION);
        copyArray(vector,actualSolution,DIMENSION);
       if(actualDistance <= minimalDistance){
@@ -247,12 +285,15 @@ void calculateNeighbors(){
      ACEPTED ? printf("\tSOLUCION CANDIDATA ACEPTADA\n\tCANDIDATAS PROBADAS: %d, ACEPTADAS: %d\n",POSIBLE_SOLUTIONS,ACEPTED_SOLUTIONS) : printf("\tCANDIDATAS PROBADAS: %d, ACEPTADAS: %d\n",POSIBLE_SOLUTIONS,ACEPTED_SOLUTIONS);
      ACEPTED=0;
      printf("\n");
-     if(POSIBLE_SOLUTIONS==80){
-     //TEMPERATURE = TEMPERATURE/(1+((TEMPERATURE-TEMPERATURE_ZERO)/(iterations*TEMPERATURE*TEMPERATURE_ZERO ))*TEMPERATURE);
-     TEMPERATURE=TEMPERATURE_ZERO/(1+cooled);
+     if(POSIBLE_SOLUTIONS==18 || ACEPTED_SOLUTIONS==5){
+      //TEMPERATURE*=0.8;
+      TEMPERATURE=TEMPERATURE_ZERO/(1+((TEMPERATURE_ZERO-TEMPERATURE)/(MAXITERATIONS*TEMPERATURE_ZERO*TEMPERATURE))*cooled);
+    //  TEMPERATURE=TEMPERATURE_ZERO/(1+log10(cooled));
      printf("============================\nENFRIAMIENTO: %d\n============================\nTEMPERATURA: %lf\n\n",cooled++,TEMPERATURE);
      POSIBLE_SOLUTIONS=0;
      ACEPTED_SOLUTIONS=0;
+     generateGreedyRestartSolution();
+     copyArray(vector,actualSolution,DIMENSION);
    }
   }
   /*cooling*/

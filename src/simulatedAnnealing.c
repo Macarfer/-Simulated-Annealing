@@ -1,12 +1,10 @@
 #include "simulatedAnnealing.h"
 
 int distanceMatrix[DIMENSION][DIMENSION];
-int swapMatrix[DIMENSION-1];
 int actualSolution[DIMENSION+1];
 int bestNeighbor[DIMENSION+1];
 int solution[DIMENSION+1];
 int freq[DIMENSION][DIMENSION]={0};
-int randomAux=0;
 int maxFreq=0;
 int minFreq=MAX_INT;
 int frequency;
@@ -28,8 +26,17 @@ int numberOfCities;
 int actualDistance;
 int newDistance=0;
 int swapArrayCount;
-int swapArrayDimension=0;
 int minimalDistance;
+<<<<<<< Updated upstream
+=======
+int restart = 1;
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 
 short activatedRandoms=0;
 double * randoms;
@@ -272,6 +279,17 @@ void calculateNeighbors(){
      copyArray(vector,actualSolution,DIMENSION);
    }
   }
+<<<<<<< Updated upstream
+=======
+  /*cooling*/
+
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 }
 
 /*Auxiliar functions*/
@@ -307,6 +325,16 @@ float calculateRandom(){
   return randoms[actualRandom];
 }
 
+<<<<<<< Updated upstream
+=======
+
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 void printMatrix(){
   int i,j;
   for (i=0;i<DIMENSION;i++) {

@@ -27,16 +27,7 @@ int actualDistance;
 int newDistance=0;
 int swapArrayCount;
 int minimalDistance;
-<<<<<<< Updated upstream
-=======
 int restart = 1;
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
 short activatedRandoms=0;
 double * randoms;
@@ -279,17 +270,7 @@ void calculateNeighbors(){
      copyArray(vector,actualSolution,DIMENSION);
    }
   }
-<<<<<<< Updated upstream
-=======
   /*cooling*/
-
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 }
 
 /*Auxiliar functions*/
@@ -325,16 +306,6 @@ float calculateRandom(){
   return randoms[actualRandom];
 }
 
-<<<<<<< Updated upstream
-=======
-
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 void printMatrix(){
   int i,j;
   for (i=0;i<DIMENSION;i++) {

@@ -3,13 +3,8 @@
 int distanceMatrix[DIMENSION][DIMENSION];
 int swapMatrix[DIMENSION-1];
 int actualSolution[DIMENSION+1];
-int tabuMatrix[DIMENSION][DIMENSION]={0};
-int tabuList[TENDENCYPARAMETER][2];
 int bestNeighbor[DIMENSION+1];
 int solution[DIMENSION+1];
-int bestSolutions[BEST_SOLUTIONS_SIZE][DIMENSION+1]={0};
-int bestSolutionsDistance[BEST_SOLUTIONS_SIZE]={0};
-int bestSolutionsActualSize=0;
 int freq[DIMENSION][DIMENSION]={0};
 int randomAux=0;
 int maxFreq=0;
@@ -26,20 +21,15 @@ short cooled=1;
 int tDistance=0;
 
 int solIterations=0;
-int iteration0Distance=0;
-int iterationsWithoutImprovement=0;
 int iterations=0;
 int bestIndex0;
 int bestIndex1;
 int numberOfCities;
 int actualDistance;
 int newDistance=0;
-int solutionNumber;
 int swapArrayCount;
 int swapArrayDimension=0;
 int minimalDistance;
-int restart = 1;
-int tabuCount=0;
 
 short activatedRandoms=0;
 double * randoms;
@@ -52,13 +42,8 @@ void printActualSolution();
 void calculateInitialDistance();
 void swap(int * returnVector,int * vector,int index0,int index1);
 void copyArray(int * hostArray, int * array,int size);
-void reorganizeTabuList();
-void printTabuList();
-void clearTabuList();
 void calculateNeighbors();
-void reinitializeTabuMatrix();
 void printArray(int * array,int size);
-void addTobestSolutions();
 int calculateDistance(int * vector);
 
 void run(){
@@ -128,7 +113,6 @@ void generateGreedyInitialSolution(){
     actualDistance = MAX_INT;
   }
   actualSolution[DIMENSION]=0;
-//printArray(actualSolution,DIMENSION);
   calculateInitialDistance();
   minimalDistance=actualDistance;
   tDistance=minimalDistance;
@@ -217,13 +201,9 @@ int calculateDistanceOptimized(int * vector,int index0,int index1){
 
 void calculateNeighbors(){
   int line=0,index0,index1,jump,first,vector[DIMENSION+1]={0};
-  iteration0Distance=actualDistance;
-  vector[0]=0;
-  vector[DIMENSION]=0;
   copyArray(bestNeighbor,actualSolution,DIMENSION);
   copyArray(vector,actualSolution,DIMENSION);
   for(;line<MAXITERATIONS;){
-  srand(time(NULL));
      index0=1;
      index1=1;
      line++;
@@ -269,17 +249,13 @@ void calculateNeighbors(){
         copyArray(solution,bestNeighbor,DIMENSION);
       }
       tDistance=actualDistance;
-      iterationsWithoutImprovement=0;
       ACEPTED_SOLUTIONS++;
       ACEPTED=1;
-     }else{
-       iterationsWithoutImprovement++;
      }
      /*===============================================*/
      /*               print zone                      */
      /*===============================================*/
      printf("ITERACION: %d\n\tINTERCAMBIO: (%d, %d)\n",iterations,bestIndex0-1,bestIndex1-1);
-     //printActualSolution();
      printArray(bestNeighbor,DIMENSION);
      printf("\tFUNCION OBJETIVO (km): %d\n\tDELTA: %d\n\tTEMPERATURA: %lf\n\tVALOR DE LA EXPONENCIAL: %lf\n",actualDistance,DELTA,TEMPERATURE,EXPONENTIAL);
      ACEPTED ? printf("\tSOLUCION CANDIDATA ACEPTADA\n\tCANDIDATAS PROBADAS: %d, ACEPTADAS: %d\n",POSIBLE_SOLUTIONS,ACEPTED_SOLUTIONS) : printf("\tCANDIDATAS PROBADAS: %d, ACEPTADAS: %d\n",POSIBLE_SOLUTIONS,ACEPTED_SOLUTIONS);
@@ -295,23 +271,6 @@ void calculateNeighbors(){
      generateGreedyRestartSolution();
      copyArray(vector,actualSolution,DIMENSION);
    }
-  }
-  /*cooling*/
-
-}
-
-void addTobestSolutions(){
-  int index;
-  for(index=0;index<BEST_SOLUTIONS_SIZE;index++){
-    if(bestSolutionsDistance[index] <= actualDistance){
-        if(index==0){
-          copyArray(solution,bestNeighbor,DIMENSION);
-          minimalDistance=actualDistance;
-        }
-      bestSolutionsActualSize<BEST_SOLUTIONS_SIZE ? bestSolutionsActualSize++ : bestSolutionsActualSize;
-      bestSolutionsDistance[index]=actualDistance;
-      copyArray(bestSolutions[index],bestNeighbor,DIMENSION);
-    }
   }
 }
 
@@ -348,35 +307,6 @@ float calculateRandom(){
   return randoms[actualRandom];
 }
 
-
-void reorganizeTabuList(){
-  int i;
-  for(i=1;i<TENDENCYPARAMETER;i++){
-    tabuList[i-1][0]=tabuList[i][0];
-    tabuList[i-1][1]=tabuList[i][1];
-  }
-}
-void clearTabuList(){
-  int i;
-  for(i=0;i<tabuCount;i++){
-    tabuList[i][0]='\0';
-    tabuList[i][1]='\0';
-  }
-}
-
-void reinitializeTabuMatrix(){
-  int i=0,j=0;
-  for(i=0;i<DIMENSION;i++)
-    for(j=0;j<DIMENSION;j++)
-      tabuMatrix[i][j]=0;
-}
-/*Print zone*/
-void printTabuList(){
-  int i;
-  for(i=0;i<tabuCount;i++){
-    printf("\t%d %d\n",tabuList[i][0]-1,tabuList[i][1]-1);
-  }
-}
 void printMatrix(){
   int i,j;
   for (i=0;i<DIMENSION;i++) {
